@@ -12,8 +12,8 @@ export default function NotFound() {
           That route is not part of this template. Head back to the homepage or the app preview.
         </p>
         <div className="flex gap-2">
-          <Button render={<Link href="/" />}>Home</Button>
-          <Button variant="outline" render={<Link href="/dashboard" />}>
+          <Button nativeButton={false} render={<Link href="/" />}>Home</Button>
+          <Button variant="outline" nativeButton={false} render={<Link href="/dashboard" />}>
             App preview
           </Button>
         </div>

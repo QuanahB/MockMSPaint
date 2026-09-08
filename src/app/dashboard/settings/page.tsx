@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +15,15 @@ import { Label } from "@/components/ui/label";
 import { currentUser } from "@/lib/mock-data";
 
 export default function SettingsPage() {
+  const [status, setStatus] = useState<string | null>(null);
+
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    toast.success("Settings kept in memory only. Persist them when the database exists.");
+    event.stopPropagation();
+    const message =
+      "Settings kept in memory only. Persist them when the database exists.";
+    setStatus(message);
+    toast.success(message);
   }
 
   return (
@@ -34,7 +41,13 @@ export default function SettingsPage() {
           <CardDescription>These fields preview the account surface.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form
+            onSubmit={onSubmit}
+            action="#"
+            method="post"
+            className="space-y-4"
+            noValidate
+          >
             <div className="space-y-2">
               <Label htmlFor="workspace">Workspace name</Label>
               <Input id="workspace" name="workspace" defaultValue="Northline Product" />
@@ -43,6 +56,11 @@ export default function SettingsPage() {
               <Label htmlFor="timezone">Timezone</Label>
               <Input id="timezone" name="timezone" defaultValue="America/Los_Angeles" />
             </div>
+            {status ? (
+              <p className="text-sm text-muted-foreground" role="status">
+                {status}
+              </p>
+            ) : null}
             <Button type="submit">Save changes</Button>
           </form>
         </CardContent>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { LayoutDashboard, FolderKanban, Settings, Menu } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { currentUser } from "@/lib/mock-data";
 import { appNav, site } from "@/lib/site";
@@ -62,6 +62,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div className="flex min-h-full flex-1 bg-muted/30">
       <aside className="hidden w-60 shrink-0 border-r bg-background md:flex md:flex-col">
@@ -84,25 +86,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6">
           <div className="flex items-center gap-2">
-            <Sheet>
-              <SheetTrigger
-                render={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="md:hidden"
-                    aria-label="Open navigation"
-                  />
-                }
-              >
-                <Menu />
-              </SheetTrigger>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="md:hidden"
+              aria-label="Open navigation"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(true)}
+            >
+              <Menu />
+            </Button>
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetContent side="left" className="w-64">
                 <SheetHeader>
                   <SheetTitle>{site.name}</SheetTitle>
                 </SheetHeader>
                 <div className="px-3">
-                  <NavLinks />
+                  <NavLinks onNavigate={() => setMenuOpen(false)} />
                 </div>
               </SheetContent>
             </Sheet>

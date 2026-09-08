@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,13 +10,13 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { marketingNav, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-md">
@@ -43,47 +44,56 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" render={<Link href="/sign-in" />}>
+          <Button variant="ghost" nativeButton={false} render={<Link href="/sign-in" />}>
             Sign in
           </Button>
-          <Button render={<Link href="/sign-up" />}>Start free</Button>
+          <Button nativeButton={false} render={<Link href="/sign-up" />}>
+            Start free
+          </Button>
         </div>
 
-        <Sheet>
-          <SheetTrigger
-            render={
-              <Button
-                variant="outline"
-                size="icon"
-                className="md:hidden"
-                aria-label="Open menu"
-              />
-            }
-          >
-            <Menu />
-          </SheetTrigger>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="md:hidden"
+          aria-label="Open menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(true)}
+        >
+          <Menu />
+        </Button>
+
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetContent side="right" className="w-72">
             <SheetHeader>
               <SheetTitle>{site.name}</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-1 px-4">
               {marketingNav.map((item) => (
-                <SheetTrigger
+                <Link
                   key={item.href}
-                  render={
-                    <Link
-                      href={item.href}
-                      className="rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    />
-                  }
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm hover:bg-muted"
                 >
                   {item.label}
-                </SheetTrigger>
+                </Link>
               ))}
-              <Button className="mt-4" render={<Link href="/sign-up" />}>
+              <Button
+                className="mt-4"
+                nativeButton={false}
+                render={<Link href="/sign-up" />}
+                onClick={() => setMenuOpen(false)}
+              >
                 Start free
               </Button>
-              <Button variant="outline" render={<Link href="/sign-in" />}>
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={<Link href="/sign-in" />}
+                onClick={() => setMenuOpen(false)}
+              >
                 Sign in
               </Button>
             </div>

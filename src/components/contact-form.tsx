@@ -9,29 +9,44 @@ import { Textarea } from "@/components/ui/textarea";
 
 export function ContactForm() {
   const [pending, setPending] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    event.stopPropagation();
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
     const message = String(data.get("message") ?? "").trim();
 
     if (!name || !email || !message) {
-      toast.error("Fill in your name, email, and message.");
+      const error = "Fill in your name, email, and message.";
+      setStatus(error);
+      toast.error(error);
       return;
     }
 
     setPending(true);
+    setStatus(null);
     window.setTimeout(() => {
+      const success =
+        "Message captured locally. Wire this form to your API when it is ready.";
       setPending(false);
-      toast.success("Message captured locally. Wire this form to your API when it is ready.");
-      event.currentTarget.reset();
-    }, 600);
+      setStatus(success);
+      toast.success(success);
+      form.reset();
+    }, 400);
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form
+      onSubmit={onSubmit}
+      action="#"
+      method="post"
+      className="space-y-4"
+      noValidate
+    >
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input id="name" name="name" placeholder="Jordan Lee" autoComplete="name" />
@@ -55,6 +70,11 @@ export function ContactForm() {
           className="min-h-32"
         />
       </div>
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
       <Button type="submit" disabled={pending} className="w-full sm:w-auto">
         {pending ? "Sending…" : "Send message"}
       </Button>

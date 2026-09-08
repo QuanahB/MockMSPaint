@@ -11,34 +11,46 @@ type AuthMode = "sign-in" | "sign-up";
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const [pending, setPending] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const isSignUp = mode === "sign-up";
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    event.stopPropagation();
     const data = new FormData(event.currentTarget);
     const email = String(data.get("email") ?? "").trim();
     const password = String(data.get("password") ?? "");
 
     if (!email || !password || (isSignUp && password.length < 8)) {
-      toast.error(
-        isSignUp
-          ? "Use a valid email and a password with at least 8 characters."
-          : "Enter your email and password.",
-      );
+      const error = isSignUp
+        ? "Use a valid email and a password with at least 8 characters."
+        : "Enter your email and password.";
+      setStatus(error);
+      toast.error(error);
       return;
     }
 
     setPending(true);
+    setStatus(null);
     window.setTimeout(() => {
+      const message =
+        "No account service yet. Point this form at your auth API when you add a backend.";
       setPending(false);
+      setStatus(message);
       toast.message("No account service yet", {
         description: "This form is UI-only. Point it at your auth API when you add a backend.",
       });
-    }, 500);
+    }, 400);
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form
+      onSubmit={onSubmit}
+      action="#"
+      method="post"
+      className="space-y-4"
+      noValidate
+    >
       {isSignUp ? (
         <div className="space-y-2">
           <Label htmlFor="name">Full name</Label>
@@ -65,6 +77,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           autoComplete={isSignUp ? "new-password" : "current-password"}
         />
       </div>
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
       <Button type="submit" disabled={pending} className="w-full">
         {pending
           ? "Working…"
