@@ -2,17 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu } from "lucide-react";
-import { MobileDrawer } from "@/components/mobile-drawer";
 import { PaintIcon } from "@/components/paint-icon";
 import { WindowControls } from "@/components/window-controls";
-import { Button } from "@/components/ui/button";
 import { marketingNav, site } from "@/lib/site";
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
   const title =
     pathname === "/"
       ? `untitled - ${site.name}`
@@ -25,7 +20,7 @@ export function SiteHeader() {
         <span className="min-w-0 flex-1 truncate">{title}</span>
         <WindowControls />
       </div>
-      <nav className="win-menubar hidden md:flex">
+      <nav className="win-menubar flex flex-wrap">
         <Link
           href="/"
           className="win-menu-item"
@@ -46,7 +41,7 @@ export function SiteHeader() {
         <Link href="/dashboard" className="win-menu-item">
           View
         </Link>
-        <span className="flex-1" />
+        <span className="hidden flex-1 sm:block" />
         <Link href="/sign-in" className="win-menu-item">
           Sign in
         </Link>
@@ -54,53 +49,6 @@ export function SiteHeader() {
           Start free
         </Link>
       </nav>
-      <div className="flex items-center justify-between px-1 py-0.5 md:hidden">
-        <span className="px-2 text-xs">File</span>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          aria-label="Open menu"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(true)}
-        >
-          <Menu />
-        </Button>
-        <MobileDrawer
-          open={menuOpen}
-          onClose={() => setMenuOpen(false)}
-          title={site.name}
-        >
-          <div className="flex flex-col gap-1">
-            {marketingNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="win-menu-item"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Button
-              className="mt-3"
-              nativeButton={false}
-              render={<Link href="/sign-up" />}
-              onClick={() => setMenuOpen(false)}
-            >
-              Start free
-            </Button>
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/sign-in" />}
-              onClick={() => setMenuOpen(false)}
-            >
-              Sign in
-            </Button>
-          </div>
-        </MobileDrawer>
-      </div>
     </header>
   );
 }
