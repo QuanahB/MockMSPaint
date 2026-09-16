@@ -18,12 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { MobileDrawer } from "@/components/mobile-drawer";
 import { currentUser } from "@/lib/mock-data";
 import { appNav, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -111,16 +106,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <Menu />
               </Button>
-              <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-                <SheetContent side="left" className="w-64 bg-[#c0c0c0]">
-                  <SheetHeader>
-                    <SheetTitle>{site.name}</SheetTitle>
-                  </SheetHeader>
-                  <div className="px-2">
-                    <NavLinks onNavigate={() => setMenuOpen(false)} />
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <MobileDrawer
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                side="left"
+                title={site.name}
+              >
+                <NavLinks onNavigate={() => setMenuOpen(false)} />
+              </MobileDrawer>
               <DropdownMenu>
                 <DropdownMenuTrigger
                   render={<Button variant="ghost" className="gap-2 px-2" />}

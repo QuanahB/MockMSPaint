@@ -4,15 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu } from "lucide-react";
+import { MobileDrawer } from "@/components/mobile-drawer";
 import { PaintIcon } from "@/components/paint-icon";
 import { WindowControls } from "@/components/window-controls";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { marketingNav, site } from "@/lib/site";
 
 export function SiteHeader() {
@@ -71,41 +66,40 @@ export function SiteHeader() {
         >
           <Menu />
         </Button>
-        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-          <SheetContent side="right" className="w-72 bg-[#c0c0c0]">
-            <SheetHeader>
-              <SheetTitle>{site.name}</SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-1 px-2">
-              {marketingNav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="win-menu-item"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Button
-                className="mt-3"
-                nativeButton={false}
-                render={<Link href="/sign-up" />}
+        <MobileDrawer
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          title={site.name}
+        >
+          <div className="flex flex-col gap-1">
+            {marketingNav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
                 onClick={() => setMenuOpen(false)}
+                className="win-menu-item"
               >
-                Start free
-              </Button>
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={<Link href="/sign-in" />}
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign in
-              </Button>
-            </div>
-          </SheetContent>
-        </Sheet>
+                {item.label}
+              </Link>
+            ))}
+            <Button
+              className="mt-3"
+              nativeButton={false}
+              render={<Link href="/sign-up" />}
+              onClick={() => setMenuOpen(false)}
+            >
+              Start free
+            </Button>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/sign-in" />}
+              onClick={() => setMenuOpen(false)}
+            >
+              Sign in
+            </Button>
+          </div>
+        </MobileDrawer>
       </div>
     </header>
   );
