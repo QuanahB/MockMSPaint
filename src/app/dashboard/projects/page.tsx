@@ -49,9 +49,9 @@ export default async function ProjectsPage() {
                 </Badge>
               </CardHeader>
               <CardContent>
-                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                <div className="win-sunken h-3 overflow-hidden bg-white">
                   <div
-                    className="h-full bg-foreground"
+                    className="h-full bg-[#000080]"
                     style={{ width: `${project.progress}%` }}
                   />
                 </div>

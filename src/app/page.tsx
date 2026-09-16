@@ -36,7 +36,7 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
           <Badge variant="secondary">React frontend template</Badge>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             {site.tagline}
           </h1>
           <p className="mt-4 text-lg text-muted-foreground text-pretty">
@@ -59,7 +59,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-t bg-muted/30">
+      <section className="border-t border-[#808080] bg-[#c0c0c0]">
         <div className="mx-auto grid w-full max-w-6xl gap-4 px-4 py-16 sm:grid-cols-3 sm:px-6">
           {pillars.map((item) => (
             <Card key={item.title}>
@@ -74,11 +74,11 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border bg-card px-6 py-12 sm:px-10">
+        <div className="rounded-none win-raised bg-[#c0c0c0] px-4 py-6 sm:px-6">
           <h2 className="text-2xl font-semibold tracking-tight">Built to merge with a backend</h2>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             Forms, lists, and empty states are already in place. Replace the functions in{" "}
-            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">src/lib/api.ts</code>{" "}
+            <code className="win-sunken bg-white px-1.5 py-0.5 font-mono text-[12px]">src/lib/api.ts</code>{" "}
             when your database and API are ready.
           </p>
           <CardContent className="mt-8 grid gap-4 p-0 sm:grid-cols-3">

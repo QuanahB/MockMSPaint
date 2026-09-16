@@ -13,8 +13,8 @@ export default function ContactPage() {
     <MarketingShell>
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.1fr]">
         <div>
-          <h1 className="text-4xl font-semibold tracking-tight">Contact</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
+          <h1 className="text-2xl font-bold tracking-tight">Contact</h1>
+          <p className="mt-3 text-[13px]">
             This form stays in the browser. Submissions are not stored until you connect an
             endpoint.
           </p>

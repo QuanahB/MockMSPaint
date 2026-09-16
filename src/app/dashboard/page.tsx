@@ -56,7 +56,7 @@ export default async function DashboardPage() {
             {projectList.slice(0, 4).map((project) => (
               <div
                 key={project.id}
-                className="flex items-center justify-between gap-4 rounded-lg border px-3 py-2"
+                className="flex items-center justify-between gap-4 win-sunken bg-white px-3 py-2"
               >
                 <div>
                   <p className="font-medium">{project.name}</p>

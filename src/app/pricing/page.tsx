@@ -44,8 +44,8 @@ export default function PricingPage() {
   return (
     <MarketingShell>
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-        <h1 className="text-4xl font-semibold tracking-tight">Simple pricing copy</h1>
-        <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight">Simple pricing copy</h1>
+        <p className="mt-3 max-w-2xl text-[13px]">
           These cards are placeholders. Replace the amounts when billing exists. Checkout is not
           wired on purpose.
         </p>
@@ -53,7 +53,7 @@ export default function PricingPage() {
           {plans.map((plan) => (
             <Card
               key={plan.name}
-              className={plan.featured ? "ring-2 ring-foreground" : undefined}
+              className={plan.featured ? "outline outline-2 outline-black" : undefined}
             >
               <CardHeader>
                 <CardTitle>{plan.name}</CardTitle>

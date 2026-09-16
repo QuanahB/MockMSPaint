@@ -4,8 +4,8 @@ export default function AboutPage() {
   return (
     <MarketingShell>
       <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-        <h1 className="text-4xl font-semibold tracking-tight">About this template</h1>
-        <div className="mt-6 space-y-4 text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight">About this template</h1>
+        <div className="mt-6 space-y-4 text-[13px]">
           <p>
             Northline is a starting UI for a product site and an authenticated-looking app. It is
             not connected to a server. Session data, projects, and metrics are local fixtures.

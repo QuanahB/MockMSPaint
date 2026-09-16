@@ -38,8 +38,8 @@ export default function FeaturesPage() {
   return (
     <MarketingShell>
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-        <h1 className="text-4xl font-semibold tracking-tight">What ships in this template</h1>
-        <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight">What ships in this template</h1>
+        <p className="mt-3 max-w-2xl text-[13px]">
           Everything on this site is frontend. The pieces below are the ones you will keep when
           you attach a database.
         </p>
