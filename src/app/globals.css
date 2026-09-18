@@ -53,12 +53,12 @@
 }
 
 :root {
-  --desktop: #008080;
-  --face: #c0c0c0;
+  --desktop: #f3f3f3;
+  --face: #ece9d8;
   --highlight: #ffffff;
   --shadow: #808080;
   --dark-shadow: #000000;
-  --titlebar: #000080;
+  --titlebar: #1f7ad6;
   --titlebar-inactive: #808080;
   --titlebar-text: #ffffff;
   --canvas: #ffffff;
@@ -97,8 +97,8 @@
 }
 
 .dark {
-  --desktop: #008080;
-  --background: #c0c0c0;
+  --desktop: #f3f3f3;
+  --background: #ece9d8;
   --foreground: #000000;
   --card: #c0c0c0;
   --card-foreground: #000000;
@@ -188,12 +188,51 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    min-height: 20px;
-    padding: 2px 3px 2px 4px;
-    background: var(--titlebar);
+    min-height: 24px;
+    padding: 3px 4px 3px 6px;
+    background: linear-gradient(to bottom, #5eb1ff 0%, #1f7ad6 45%, #0b5fbf 100%);
     color: var(--titlebar-text);
     font-weight: 700;
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .paint-frame {
+    background: #ece9d8;
+    border: 4px solid #1f7ad6;
+    box-shadow:
+      inset 1px 1px 0 #7ec4ff,
+      2px 2px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .paint-scroll {
+    overflow: auto;
+  }
+
+  .paint-scroll::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+
+  .paint-scroll::-webkit-scrollbar-track {
+    background: #ece9d8;
+  }
+
+  .paint-scroll::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #808080 #808080 #fff;
+  }
+
+  .paint-scroll::-webkit-scrollbar-button {
+    width: 16px;
+    height: 16px;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #000 #000 #fff;
+  }
+
+  .paint-scroll::-webkit-scrollbar-corner {
+    background: #c0c0c0;
   }
 
   .win-menubar {

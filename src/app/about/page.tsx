@@ -1,23 +1,20 @@
 import { MarketingShell } from "@/components/marketing-shell";
+import { site } from "@/lib/site";
 
 export default function AboutPage() {
   return (
     <MarketingShell>
-      <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-        <h1 className="text-2xl font-bold tracking-tight">About this template</h1>
+      <div className="paint-scroll mx-auto w-full max-w-3xl bg-white px-4 py-12 sm:px-6">
+        <h1 className="text-2xl font-bold tracking-tight">About {site.name}</h1>
         <div className="mt-6 space-y-4 text-[13px]">
           <p>
-            Northline is a starting UI for a product site and an authenticated-looking app. It is
-            not connected to a server. Session data, projects, and metrics are local fixtures.
+            {site.name} ({site.tagline}) is a clothing shop drawn inside a Microsoft Paint window.
+            The homepage is the canvas. Shop, collections, and videos are ready to fill once a
+            backend exists.
           </p>
           <p>
-            Use it when you want layout, navigation, and copy in place before the API is designed.
-            The React tree is Next.js App Router with TypeScript, Tailwind CSS, and shadcn/ui.
-          </p>
-          <p>
-            When you add a backend, keep the pages and replace the functions in the data layer.
-            Do not introduce a second component library or a second styling system unless you
-            intend to migrate the whole template.
+            This frontend is React (Next.js) only. Forms stay in the browser. Swap the mock data
+            layer when you add a database.
           </p>
         </div>
       </div>

@@ -1,13 +1,15 @@
 export const site = {
-  name: "Northline",
-  tagline: "The operating layer for product teams",
+  name: "OIMADIS",
+  tagline: "Oh-I-Made-This",
   description:
-    "Plan work, track delivery, and keep every stakeholder aligned. Northline is a React frontend template ready to connect to your own API and database.",
+    "OIMADIS is a handmade clothing shop sketched in Microsoft Paint. Browse the canvas, then shop the pieces when the catalog is wired up.",
 } as const;
 
 export const marketingNav = [
-  { href: "/features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/shop", label: "Shop" },
+  { href: "/collections", label: "Collections" },
+  { href: "/videos", label: "Videos" },
+  { href: "/", label: "Paint" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;
