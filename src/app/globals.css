@@ -302,8 +302,9 @@
 
   .win-swatch {
     width: 16px;
-    height: 16px;
-    border: 1px solid #000;
-    box-shadow: inset 1px 1px 0 #fff;
+    height: 15px;
+    border: 1px solid;
+    border-color: #808080 #fff #fff #808080;
+    box-shadow: inset 1px 1px 0 #000;
   }
 }

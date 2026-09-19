@@ -11,7 +11,7 @@ const PALETTE = [
   "#004040",
   "#0080ff",
   "#004080",
-  "#4000ff",
+  "#400080",
   "#804000",
   "#ffffff",
   "#c0c0c0",
@@ -22,10 +22,10 @@ const PALETTE = [
   "#0000ff",
   "#ff00ff",
   "#ffff80",
-  "#00ff80",
+  "#80ff80",
   "#80ffff",
   "#8080ff",
-  "#ff0080",
+  "#ff80c0",
   "#ff8040",
 ];
 
@@ -34,10 +34,16 @@ export function PaintPalette() {
   const bottom = PALETTE.slice(14);
 
   return (
-    <div className="flex items-center gap-1 bg-[#c0c0c0] px-1 py-1">
-      <div className="win-sunken flex size-8 shrink-0 flex-col p-0.5">
-        <span className="h-3.5 w-full bg-black" />
-        <span className="h-3.5 w-full bg-white" />
+    <div className="flex items-end gap-2 bg-[#ece9d8] px-2 py-1.5">
+      <div className="relative h-[36px] w-[36px] shrink-0">
+        <span
+          className="absolute top-[10px] left-[10px] h-5 w-5 border border-[#808080] bg-white shadow-[inset_1px_1px_0_#fff,1px_1px_0_#000]"
+          aria-hidden
+        />
+        <span
+          className="absolute top-0 left-0 h-5 w-5 border border-[#808080] bg-black shadow-[inset_1px_1px_0_#404040,1px_1px_0_#000]"
+          aria-hidden
+        />
       </div>
       <div className="flex flex-col gap-px">
         <div className="flex">

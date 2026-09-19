@@ -1,4 +1,5 @@
 import { PaintTools } from "@/components/paint-tools";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 export function MarketingShell({ children }: { children: React.ReactNode }) {
@@ -12,6 +13,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
           </aside>
           <main className="paint-scroll win-canvas min-w-0 flex-1 bg-white">{children}</main>
         </div>
+        <SiteFooter />
       </div>
     </div>
   );
