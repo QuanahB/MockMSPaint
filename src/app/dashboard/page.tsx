@@ -1,3 +1,4 @@
+import { CheckoutReturn } from "@/components/checkout-return";
 import { getActivity, getMetrics, getProjects } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,7 +16,12 @@ const statusLabel: Record<ProjectStatus, string> = {
   done: "Done",
 };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string; checkout?: string }>;
+}) {
+  const params = await searchParams;
   const [metricList, projectList, activityList] = await Promise.all([
     getMetrics(),
     getProjects(),
@@ -24,6 +30,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
+      <CheckoutReturn
+        sessionId={params.session_id}
+        cancelled={params.checkout === "cancelled"}
+      />
+
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
         <p className="mt-1 text-sm text-muted-foreground">
