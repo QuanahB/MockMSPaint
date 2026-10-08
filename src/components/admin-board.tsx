@@ -16,7 +16,7 @@ import {
   updateAdminProduct,
 } from "@/lib/api";
 import { EmptyState, ErrorState, LoadingState } from "@/components/query-state";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -343,10 +343,9 @@ export function AdminBoard() {
     };
   }, [authed, catalogTick]);
 
-  async function onLogin(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    event.stopPropagation();
-    const nextPassword = String(new FormData(event.currentTarget).get("password") ?? "");
+  async function submitPassword(form: HTMLFormElement) {
+    const nextPassword =
+      password.trim() || String(new FormData(form).get("password") ?? "").trim();
     if (!nextPassword) {
       setSessionError("Type the staff password.");
       return;
@@ -367,6 +366,12 @@ export function AdminBoard() {
     } finally {
       setPending(null);
     }
+  }
+
+  function onLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    void submitPassword(event.currentTarget);
   }
 
   async function onLogout() {
@@ -472,13 +477,7 @@ export function AdminBoard() {
             <ErrorState title="Request failed" description={sessionError} />
           </div>
         ) : null}
-        <form
-          onSubmit={onLogin}
-          action="#"
-          method="post"
-          className="mt-6 max-w-sm space-y-3"
-          noValidate
-        >
+        <form onSubmit={onLogin} className="mt-6 max-w-sm space-y-3" noValidate>
           <div className="space-y-1">
             <Label htmlFor="admin-password">Password</Label>
             <Input
@@ -491,9 +490,19 @@ export function AdminBoard() {
               required
             />
           </div>
-          <Button type="submit" disabled={pending === "login"}>
+          <button
+            type="button"
+            className={buttonVariants()}
+            disabled={pending === "login"}
+            onClick={(event) => {
+              const form = event.currentTarget.form;
+              if (form) {
+                void submitPassword(form);
+              }
+            }}
+          >
             {pending === "login" ? "Opening…" : "Unlock"}
-          </Button>
+          </button>
         </form>
       </div>
     );
