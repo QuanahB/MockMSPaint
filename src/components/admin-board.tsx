@@ -260,8 +260,8 @@ function ProductFields({
 }
 
 export function AdminBoard() {
-  const [sessionReady, setSessionReady] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const [sessionChecking, setSessionChecking] = useState(true);
   const [password, setPassword] = useState("");
   const [sessionError, setSessionError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -276,29 +276,36 @@ export function AdminBoard() {
   const [catalogTick, setCatalogTick] = useState(0);
 
   useEffect(() => {
-    let ignore = false;
-    getAdminSession()
-      .then((session) => {
-        if (ignore) {
+    const controller = new AbortController();
+
+    async function checkSession() {
+      try {
+        const session = await getAdminSession();
+        if (controller.signal.aborted) {
           return;
         }
-        const isAdmin = Boolean(session.admin);
-        setAuthed(isAdmin);
-        if (isAdmin) {
+        if (session.admin) {
           setCatalogLoading(true);
+          setAuthed(true);
         }
-        setSessionReady(true);
-      })
-      .catch((caught: unknown) => {
-        if (ignore) {
+      } catch (caught: unknown) {
+        if (controller.signal.aborted) {
           return;
         }
-        setSessionError(caught instanceof Error ? caught.message : "Could not check staff session.");
+        setSessionError(
+          caught instanceof Error ? caught.message : "Could not check staff session.",
+        );
         setAuthed(false);
-        setSessionReady(true);
-      });
+      } finally {
+        if (!controller.signal.aborted) {
+          setSessionChecking(false);
+        }
+      }
+    }
+
+    void checkSession();
     return () => {
-      ignore = true;
+      controller.abort();
     };
   }, []);
 
@@ -448,14 +455,6 @@ export function AdminBoard() {
     }
   }
 
-  if (!sessionReady) {
-    return (
-      <div className="bg-white p-6">
-        <LoadingState label="Checking staff session" />
-      </div>
-    );
-  }
-
   if (!authed) {
     return (
       <div className="paint-scroll min-h-full min-w-[480px] bg-white p-6">
@@ -464,6 +463,9 @@ export function AdminBoard() {
           This catalog editor is for OIMADIS staff. Shoppers do not have accounts. Type the
           password; it is never stored in this page.
         </p>
+        {sessionChecking ? (
+          <p className="mt-3 text-[13px] text-[#808080]">Checking staff session…</p>
+        ) : null}
         {sessionError ? (
           <div className="mt-4">
             <ErrorState title="Request failed" description={sessionError} />
