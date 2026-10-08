@@ -61,22 +61,34 @@ async function storeRequest<T>(path: string, init?: RequestInit): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`${base}${path}`, {
-    ...init,
-    credentials: "include",
-    cache: "no-store",
-    headers,
-  });
+  try {
+    const res = await fetch(`${base}${path}`, {
+      ...init,
+      credentials: "include",
+      cache: "no-store",
+      headers,
+      signal: init?.signal ?? AbortSignal.timeout(45_000),
+    });
 
-  if (res.status === 204) {
-    return undefined as T;
+    if (res.status === 204) {
+      return undefined as T;
+    }
+
+    if (!res.ok) {
+      throw new ApiError(await readErrorMessage(res), res.status);
+    }
+
+    return res.json() as Promise<T>;
+  } catch (caught) {
+    if (caught instanceof ApiError) {
+      throw caught;
+    }
+    const name = caught instanceof Error ? caught.name : "";
+    if (name === "TimeoutError" || name === "AbortError") {
+      throw new ApiError("The store API did not respond.");
+    }
+    throw new ApiError(caught instanceof Error ? caught.message : "Request failed");
   }
-
-  if (!res.ok) {
-    throw new ApiError(await readErrorMessage(res), res.status);
-  }
-
-  return res.json() as Promise<T>;
 }
 
 function asProductList(data: unknown): Product[] {

@@ -476,7 +476,7 @@ export function AdminBoard() {
             <input
               id="admin-password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="off"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               onKeyDown={(event) => {
