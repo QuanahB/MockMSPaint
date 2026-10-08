@@ -1,5 +1,14 @@
 import { activity, metrics, projects } from "@/lib/mock-data";
-import type { Cart, CheckoutPayload, CheckoutStart, Product, StoreOrder } from "@/lib/types";
+import type {
+  AdminSession,
+  Cart,
+  CatalogOption,
+  CheckoutPayload,
+  CheckoutStart,
+  Product,
+  ProductWrite,
+  StoreOrder,
+} from "@/lib/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -125,3 +134,88 @@ export function confirmCheckout(sessionId: string) {
     `/checkout/confirm?${query.toString()}`,
   );
 }
+
+function asOptionList(data: unknown, key: "categories" | "collections"): CatalogOption[] {
+  const rows = Array.isArray(data)
+    ? data
+    : data && typeof data === "object" && Array.isArray((data as Record<string, unknown>)[key])
+      ? ((data as Record<string, unknown>)[key] as unknown[])
+      : null;
+  if (!rows) {
+    throw new ApiError(`The ${key} response was not a list`);
+  }
+  return rows.map((row) => {
+    if (typeof row === "string") {
+      return { slug: row };
+    }
+    if (row && typeof row === "object" && "slug" in row) {
+      const option = row as CatalogOption;
+      return { slug: option.slug, name: option.name };
+    }
+    throw new ApiError(`A ${key} entry was missing a slug`);
+  });
+}
+
+function asProduct(data: unknown): Product {
+  if (data && typeof data === "object" && "product" in data) {
+    return (data as { product: Product }).product;
+  }
+  return data as Product;
+}
+
+export async function getAdminSession() {
+  try {
+    return await storeRequest<AdminSession>("/admin/session");
+  } catch (caught) {
+    if (caught instanceof ApiError && caught.status === 401) {
+      return { admin: false };
+    }
+    throw caught;
+  }
+}
+
+export function adminLogin(password: string) {
+  return storeRequest<AdminSession>("/admin/login", {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  });
+}
+
+export function adminLogout() {
+  return storeRequest<AdminSession | undefined>("/admin/logout", {
+    method: "POST",
+  });
+}
+
+export function getCategories() {
+  return storeRequest<unknown>("/categories").then((data) =>
+    asOptionList(data, "categories"),
+  );
+}
+
+export function getCollections() {
+  return storeRequest<unknown>("/collections").then((data) =>
+    asOptionList(data, "collections"),
+  );
+}
+
+export function createAdminProduct(body: ProductWrite) {
+  return storeRequest<unknown>("/admin/products", {
+    method: "POST",
+    body: JSON.stringify(body),
+  }).then(asProduct);
+}
+
+export function updateAdminProduct(id: Product["id"], body: Partial<ProductWrite>) {
+  return storeRequest<unknown>(`/admin/products/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  }).then(asProduct);
+}
+
+export function deleteAdminProduct(id: Product["id"]) {
+  return storeRequest<undefined>(`/admin/products/${id}`, {
+    method: "DELETE",
+  });
+}
+

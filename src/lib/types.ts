@@ -75,3 +75,23 @@ export type CheckoutStart = {
   checkout_url: string;
   order: StoreOrder;
 };
+
+export type CatalogOption = {
+  slug: string;
+  name?: string;
+};
+
+export type ProductWrite = {
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  collection: string;
+  sizes: string[];
+  colors: string[];
+  stock: number;
+};
+
+export type AdminSession = {
+  admin: boolean;
+};

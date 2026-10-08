@@ -1,6 +1,6 @@
-# Northline frontend template
+# OIMADIS
 
-A React frontend for a product website and in-app workspace. It is ready to merge with a backend and database later. Nothing is persisted yet.
+A Microsoft Paint–styled shopfront for OIMADIS (Oh-I-Made-This). The catalog, cart, and checkout talk to the store API at `NEXT_PUBLIC_API_URL` with no `/api` prefix.
 
 Stack: **Next.js** (App Router), **TypeScript**, **Tailwind CSS**, and **shadcn/ui**.
 
@@ -8,38 +8,24 @@ Stack: **Next.js** (App Router), **TypeScript**, **Tailwind CSS**, and **shadcn/
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 
 Open [http://localhost:4321](http://localhost:4321).
 
-Production build:
+`.env.example` points at `http://localhost:4000`. Production builds use `.env.production` (`https://storebackend-ivb3.onrender.com`).
 
 ```bash
 npm run build
 npm start
 ```
 
-## What you can click through
+## Pages
 
-- Marketing pages: home, features, pricing, about, contact
-- Account screens: sign in and sign up (UI only)
-- App preview: dashboard overview, projects, settings
+- Canvas home, shop (live catalog + Stripe test checkout), collections, videos, about, contact
+- Staff catalog editor at `/admin` (not in the public nav). Shoppers do not have accounts. Unlock with the API password, then create, patch, and delete products.
 
-Contact, auth, and settings forms validate in the browser and show a toast. They do not write to a server.
+## Staff editor
 
-## Connect an API later
-
-Data lives in `src/lib/mock-data.ts` and is loaded through `src/lib/api.ts`.
-
-1. Set `NEXT_PUBLIC_API_URL` to your API origin (see `.env.example`).
-2. Keep the TypeScript types in `src/lib/types.ts` in sync with your backend.
-3. Replace the fallback returns in `src/lib/api.ts` with real endpoints as they exist.
-
-Until that env var is set, the app serves the bundled mock records.
-
-## Layout notes
-
-- Marketing chrome: `src/components/site-header.tsx`, `src/components/site-footer.tsx`
-- App chrome: `src/components/app-shell.tsx`
-- Loading / empty / error: `src/components/query-state.tsx`
+`/admin` checks `GET /admin/session` with `credentials: "include"`. A false session shows a password form (`POST /admin/login`). The password is typed by staff and is not stored in this repo. Lock calls `POST /admin/logout`.
