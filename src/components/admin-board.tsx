@@ -186,7 +186,7 @@ function ProductFields({
         <Input
           id={`${idPrefix}-name`}
           value={value.name}
-          onChange={(event) => onChange({ ...value, name: event.target.value })}
+          onValueChange={(name) => onChange({ ...value, name })}
         />
       </div>
       <div className="space-y-1 sm:col-span-2">
@@ -205,9 +205,7 @@ function ProductFields({
           min={0}
           step="0.01"
           value={Number.isFinite(value.price) ? value.price : ""}
-          onChange={(event) =>
-            onChange({ ...value, price: Number(event.target.value) })
-          }
+          onValueChange={(price) => onChange({ ...value, price: Number(price) })}
         />
       </div>
       <div className="space-y-1">
@@ -218,9 +216,7 @@ function ProductFields({
           min={0}
           step="1"
           value={Number.isFinite(value.stock) ? value.stock : ""}
-          onChange={(event) =>
-            onChange({ ...value, stock: Number(event.target.value) })
-          }
+          onValueChange={(stock) => onChange({ ...value, stock: Number(stock) })}
         />
       </div>
       <OptionSelect
@@ -242,7 +238,7 @@ function ProductFields({
         <Input
           id={`${idPrefix}-sizes`}
           value={value.sizes}
-          onChange={(event) => onChange({ ...value, sizes: event.target.value })}
+          onValueChange={(sizes) => onChange({ ...value, sizes })}
           placeholder="S, M, L"
         />
       </div>
@@ -251,7 +247,7 @@ function ProductFields({
         <Input
           id={`${idPrefix}-colors`}
           value={value.colors}
-          onChange={(event) => onChange({ ...value, colors: event.target.value })}
+          onValueChange={(colors) => onChange({ ...value, colors })}
           placeholder="black, white"
         />
       </div>
@@ -276,36 +272,35 @@ export function AdminBoard() {
   const [catalogTick, setCatalogTick] = useState(0);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let live = true;
 
-    async function checkSession() {
-      try {
-        const session = await getAdminSession();
-        if (controller.signal.aborted) {
+    getAdminSession()
+      .then((session) => {
+        if (!live) {
           return;
         }
         if (session.admin) {
           setCatalogLoading(true);
           setAuthed(true);
         }
-      } catch (caught: unknown) {
-        if (controller.signal.aborted) {
+      })
+      .catch((caught: unknown) => {
+        if (!live) {
           return;
         }
         setSessionError(
           caught instanceof Error ? caught.message : "Could not check staff session.",
         );
         setAuthed(false);
-      } finally {
-        if (!controller.signal.aborted) {
+      })
+      .finally(() => {
+        if (live) {
           setSessionChecking(false);
         }
-      }
-    }
+      });
 
-    void checkSession();
     return () => {
-      controller.abort();
+      live = false;
     };
   }, []);
 
@@ -350,12 +345,18 @@ export function AdminBoard() {
 
   async function onLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    event.stopPropagation();
+    const nextPassword = String(new FormData(event.currentTarget).get("password") ?? "");
+    if (!nextPassword) {
+      setSessionError("Type the staff password.");
+      return;
+    }
     setPending("login");
     setSessionError(null);
     try {
-      const session = await adminLogin(password);
-      setPassword("");
+      const session = await adminLogin(nextPassword);
       if (session.admin) {
+        setPassword("");
         setCatalogLoading(true);
         setAuthed(true);
       } else {
@@ -471,7 +472,13 @@ export function AdminBoard() {
             <ErrorState title="Request failed" description={sessionError} />
           </div>
         ) : null}
-        <form onSubmit={onLogin} className="mt-6 max-w-sm space-y-3" noValidate>
+        <form
+          onSubmit={onLogin}
+          action="#"
+          method="post"
+          className="mt-6 max-w-sm space-y-3"
+          noValidate
+        >
           <div className="space-y-1">
             <Label htmlFor="admin-password">Password</Label>
             <Input
@@ -480,11 +487,11 @@ export function AdminBoard() {
               name="password"
               autoComplete="current-password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onValueChange={setPassword}
               required
             />
           </div>
-          <Button type="submit" disabled={pending === "login" || !password}>
+          <Button type="submit" disabled={pending === "login"}>
             {pending === "login" ? "Opening…" : "Unlock"}
           </Button>
         </form>
