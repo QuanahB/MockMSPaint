@@ -33,8 +33,14 @@ export function StatusBoard() {
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+  const [ticker, setTicker] = useState(0);
 
-  const statusText = notes[0]?.message?.trim() || HELP_LINE;
+  const messages = notes
+    .map((note) => note.message.trim())
+    .filter(Boolean);
+  const statusText = messages.length
+    ? messages[ticker % messages.length]
+    : HELP_LINE;
 
   useEffect(() => {
     if (!apiUrl) {
@@ -67,6 +73,18 @@ export function StatusBoard() {
       live = false;
     };
   }, [apiUrl]);
+
+  useEffect(() => {
+    if (open || messages.length < 2) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setTicker((current) => current + 1);
+    }, 4000);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [open, messages.length]);
 
   async function reloadBoard() {
     const next = await getBoardNotes();
@@ -188,6 +206,7 @@ export function StatusBoard() {
           className="win-status-cell w-full cursor-pointer text-left"
           aria-expanded={open}
           aria-controls="board-panel"
+          aria-live="polite"
           onClick={() => setOpen((value) => !value)}
           title={statusText}
         >
