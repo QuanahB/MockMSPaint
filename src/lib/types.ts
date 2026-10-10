@@ -95,3 +95,9 @@ export type ProductWrite = {
 export type AdminSession = {
   admin: boolean;
 };
+
+export type BoardNote = {
+  id: number;
+  message: string;
+  created_at: string;
+};

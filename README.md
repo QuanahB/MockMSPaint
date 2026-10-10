@@ -24,6 +24,7 @@ npm start
 ## Pages
 
 - Canvas home, shop (live catalog + Stripe test checkout), collections, videos, about, contact
+- Paint status line is an anonymous note board (`GET`/`POST /board`) when `NEXT_PUBLIC_API_URL` is set. No accounts. Staff can remove notes after unlocking at `/admin`.
 - Staff catalog editor at `/admin` (not in the public nav). Shoppers do not have accounts. Unlock with the API password, then create, patch, and delete products.
 
 ## Staff editor

@@ -1,6 +1,7 @@
 import { activity, metrics, projects } from "@/lib/mock-data";
 import type {
   AdminSession,
+  BoardNote,
   Cart,
   CatalogOption,
   CheckoutPayload,
@@ -227,6 +228,37 @@ export function updateAdminProduct(id: Product["id"], body: Partial<ProductWrite
 
 export function deleteAdminProduct(id: Product["id"]) {
   return storeRequest<undefined>(`/admin/products/${id}`, {
+    method: "DELETE",
+  });
+}
+
+function asBoardNotes(data: unknown): BoardNote[] {
+  if (!Array.isArray(data)) {
+    throw new ApiError("The board response was not a list");
+  }
+  return data as BoardNote[];
+}
+
+function asBoardNote(data: unknown): BoardNote {
+  if (data && typeof data === "object" && "note" in data) {
+    return (data as { note: BoardNote }).note;
+  }
+  return data as BoardNote;
+}
+
+export function getBoardNotes() {
+  return storeRequest<unknown>("/board").then(asBoardNotes);
+}
+
+export function postBoardNote(message: string) {
+  return storeRequest<unknown>("/board", {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  }).then(asBoardNote);
+}
+
+export function deleteBoardNote(id: number) {
+  return storeRequest<undefined>(`/admin/board/${id}`, {
     method: "DELETE",
   });
 }
