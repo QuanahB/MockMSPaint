@@ -90,6 +90,7 @@ export type ProductWrite = {
   sizes: string[];
   colors: string[];
   stock: number;
+  image_url?: string;
 };
 
 export type AdminSession = {

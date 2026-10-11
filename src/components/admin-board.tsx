@@ -56,6 +56,15 @@ function sameList(left: string[], right: string[]) {
   return left.length === right.length && left.every((item, index) => item === right[index]);
 }
 
+function isHttpsLink(value: string) {
+  return value.trim().toLowerCase().startsWith("https://");
+}
+
+function savedHttpsLink(product: Product) {
+  const url = product.image_url?.trim() ?? "";
+  return isHttpsLink(url) ? url : "";
+}
+
 function productDiff(original: Product, next: ProductWrite): Partial<ProductWrite> {
   const patch: Partial<ProductWrite> = {};
   if (next.name !== original.name) {
@@ -82,6 +91,11 @@ function productDiff(original: Product, next: ProductWrite): Partial<ProductWrit
   if (next.stock !== original.stock) {
     patch.stock = next.stock;
   }
+  const nextLink = (next.image_url ?? "").trim();
+  const savedLink = savedHttpsLink(original);
+  if (nextLink !== savedLink) {
+    patch.image_url = nextLink;
+  }
   return patch;
 }
 
@@ -94,6 +108,7 @@ type ProductForm = {
   sizes: string;
   colors: string;
   stock: number;
+  imageUrl: string;
 };
 
 function draftFromProduct(product: Product): ProductForm {
@@ -106,6 +121,7 @@ function draftFromProduct(product: Product): ProductForm {
     sizes: formatList(product.sizes),
     colors: formatList(product.colors),
     stock: product.stock,
+    imageUrl: isHttpsLink(product.image_url) ? product.image_url : "",
   };
 }
 
@@ -119,6 +135,7 @@ function toWrite(form: ProductForm): ProductWrite {
     sizes: parseList(form.sizes),
     colors: parseList(form.colors),
     stock: form.stock,
+    image_url: form.imageUrl.trim(),
   };
 }
 
@@ -131,6 +148,7 @@ const emptyCreate: ProductForm = {
   sizes: "",
   colors: "",
   stock: 0,
+  imageUrl: "",
 };
 
 function OptionSelect({
@@ -249,6 +267,15 @@ function ProductFields({
           value={value.colors}
           onValueChange={(colors) => onChange({ ...value, colors })}
           placeholder="black, white"
+        />
+      </div>
+      <div className="space-y-1 sm:col-span-2">
+        <Label htmlFor={`${idPrefix}-image-url`}>Image link</Label>
+        <Input
+          id={`${idPrefix}-image-url`}
+          value={value.imageUrl}
+          onValueChange={(imageUrl) => onChange({ ...value, imageUrl })}
+          placeholder="https://"
         />
       </div>
     </div>
@@ -536,8 +563,8 @@ export function AdminBoard() {
         <div>
           <h1 className="text-xl font-bold">Catalog</h1>
           <p className="mt-1 max-w-xl text-[13px]">
-            Add and edit pieces for the shop. Images stay on the API; this window only writes
-            copy, price, category, collection, sizes, colors, and stock.
+            Add and edit pieces for the shop. The image field takes an https photo link. A blank
+            field keeps the generated canvas.
           </p>
         </div>
         <Button type="button" onClick={() => void onLogout()} disabled={pending === "logout"}>
