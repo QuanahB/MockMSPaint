@@ -25,13 +25,31 @@ function collectionImageSrc(collection: Collection) {
   return `${origin}${collection.image_url}`;
 }
 
+function Placeholder() {
+  return (
+    <div className="paint-scroll flex min-h-full min-w-[640px] items-start bg-white p-8">
+      <div>
+        <h1 className="text-xl font-bold">Collections</h1>
+        <p className="mt-3 max-w-lg text-[13px]">
+          Drops will land here. This page is a canvas placeholder so the Paint window stays
+          intact while you design the first collection.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function CollectionBoard() {
+  const apiUrl = getStoreApiUrl();
   const [collections, setCollections] = useState<Collection[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(apiUrl));
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
+    if (!apiUrl) {
+      return;
+    }
     let ignore = false;
     getCollectionList()
       .then((next) => {
@@ -53,7 +71,11 @@ export function CollectionBoard() {
     return () => {
       ignore = true;
     };
-  }, [reload]);
+  }, [apiUrl, reload]);
+
+  if (!apiUrl) {
+    return <Placeholder />;
+  }
 
   if (loading) {
     return (

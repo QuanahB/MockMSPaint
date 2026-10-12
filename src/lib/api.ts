@@ -12,10 +12,17 @@ import type {
   StoreOrder,
 } from "@/lib/types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const PRODUCTION_STORE_API = "https://storebackend-ivb3.onrender.com";
 
 export function getStoreApiUrl() {
-  return API_BASE?.replace(/\/$/, "") ?? "";
+  const fromEnv = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
+  if (fromEnv) {
+    return fromEnv;
+  }
+  if (process.env.NODE_ENV === "production") {
+    return PRODUCTION_STORE_API;
+  }
+  return "";
 }
 
 export class ApiError extends Error {

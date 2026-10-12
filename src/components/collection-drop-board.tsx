@@ -35,14 +35,18 @@ function productImageSrc(product: Product) {
 }
 
 export function CollectionDropBoard({ slug }: { slug: string }) {
+  const apiUrl = getStoreApiUrl();
   const [collection, setCollection] = useState<Collection | null>(null);
   const [sizes, setSizes] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(apiUrl));
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!apiUrl) {
+      return;
+    }
     let ignore = false;
     getCollection(slug)
       .then((next) => {
@@ -74,7 +78,21 @@ export function CollectionDropBoard({ slug }: { slug: string }) {
     return () => {
       ignore = true;
     };
-  }, [slug]);
+  }, [apiUrl, slug]);
+
+  if (!apiUrl) {
+    return (
+      <div className="paint-scroll flex min-h-full min-w-[640px] items-start bg-white p-8">
+        <div>
+          <h1 className="text-xl font-bold">Collections</h1>
+          <p className="mt-3 max-w-lg text-[13px]">
+            Drops will land here. This page is a canvas placeholder so the Paint window stays
+            intact while you design the first collection.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   async function onAdd(product: Product) {
     if (product.stock <= 0) {
