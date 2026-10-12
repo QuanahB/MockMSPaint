@@ -29,8 +29,8 @@ On `/`, the window is a drawing surface. Left click uses the foreground color; r
 
 - Paint tab (`/`) is a working Microsoft Paint canvas (pencil, eraser, fill, line, curve, shapes, clothing stamps, palette, undo). Shop (live catalog + Stripe test checkout), collections (live drops from `GET /collections`), videos, about, contact
 - Paint status line is an anonymous note board (`GET`/`POST /board`) when `NEXT_PUBLIC_API_URL` is set. No accounts. Staff can remove notes after unlocking at `/admin`.
-- Staff catalog editor at `/admin` (not in the public nav). Shoppers do not have accounts. Unlock with the API password, then create, patch, and delete products.
+- Staff catalog editor at `/admin` (not in the public nav). Shoppers do not have accounts. Unlock with the API password, then create, patch, and delete products and collection drops.
 
 ## Staff editor
 
-`/admin` checks `GET /admin/session` with `credentials: "include"`. A false session shows a password form (`POST /admin/login`). The password is typed by staff and is not stored in this repo. Lock calls `POST /admin/logout`.
+`/admin` checks `GET /admin/session` with `credentials: "include"`. A false session shows a password form (`POST /admin/login`). The password is typed by staff and is not stored in this repo. Lock calls `POST /admin/logout`. After unlock, staff can edit pieces and drops. A blank drop cover keeps the first piece's picture; an https cover is stored as `custom_image_url` and shown on `/collections` via `image_url`.

@@ -111,5 +111,13 @@ export type Collection = {
   season: string;
   product_count: number;
   image_url: string | null;
+  custom_image_url: string | null;
   products?: Product[];
+};
+
+export type CollectionWrite = {
+  name: string;
+  description: string;
+  season: string;
+  image_url: string;
 };

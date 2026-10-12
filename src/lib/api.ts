@@ -7,6 +7,7 @@ import type {
   CheckoutPayload,
   CheckoutStart,
   Collection,
+  CollectionWrite,
   Product,
   ProductWrite,
   StoreOrder,
@@ -294,5 +295,25 @@ export function getCollectionList() {
 
 export function getCollection(slug: string) {
   return storeRequest<unknown>(`/collections/${encodeURIComponent(slug)}`).then(asCollection);
+}
+
+export function createAdminCollection(body: CollectionWrite) {
+  return storeRequest<unknown>("/admin/collections", {
+    method: "POST",
+    body: JSON.stringify(body),
+  }).then(asCollection);
+}
+
+export function updateAdminCollection(id: Collection["id"], body: Partial<CollectionWrite>) {
+  return storeRequest<unknown>(`/admin/collections/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  }).then(asCollection);
+}
+
+export function deleteAdminCollection(id: Collection["id"]) {
+  return storeRequest<undefined>(`/admin/collections/${id}`, {
+    method: "DELETE",
+  });
 }
 

@@ -6,13 +6,17 @@ import {
   adminLogin,
   adminLogout,
   ApiError,
+  createAdminCollection,
   createAdminProduct,
+  deleteAdminCollection,
   deleteAdminProduct,
   getAdminSession,
   getCategories,
+  getCollectionList,
   getCollections,
   getProducts,
   getStoreApiUrl,
+  updateAdminCollection,
   updateAdminProduct,
 } from "@/lib/api";
 import { EmptyState, ErrorState, LoadingState } from "@/components/query-state";
@@ -28,17 +32,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { CatalogOption, Product, ProductWrite } from "@/lib/types";
+import type { CatalogOption, Collection, CollectionWrite, Product, ProductWrite } from "@/lib/types";
 
-function productImageSrc(product: Product) {
+function catalogImageSrc(url: string | null | undefined) {
   const origin = getStoreApiUrl();
-  if (!product.image_url) {
+  if (!url) {
     return "";
   }
-  if (product.image_url.startsWith("http")) {
-    return product.image_url;
+  if (url.startsWith("http")) {
+    return url;
   }
-  return `${origin}${product.image_url}`;
+  return `${origin}${url}`;
+}
+
+function productImageSrc(product: Product) {
+  return catalogImageSrc(product.image_url);
+}
+
+function collectionDisplaySrc(collection: Collection) {
+  return catalogImageSrc(collection.image_url);
 }
 
 function parseList(value: string) {
@@ -150,6 +162,107 @@ const emptyCreate: ProductForm = {
   stock: 0,
   imageUrl: "",
 };
+
+type CollectionForm = {
+  name: string;
+  description: string;
+  season: string;
+  imageUrl: string;
+};
+
+const emptyCollectionCreate: CollectionForm = {
+  name: "",
+  description: "",
+  season: "",
+  imageUrl: "",
+};
+
+function savedCoverLink(collection: Collection) {
+  return collection.custom_image_url?.trim() ?? "";
+}
+
+function draftFromCollection(collection: Collection): CollectionForm {
+  return {
+    name: collection.name,
+    description: collection.description,
+    season: collection.season,
+    imageUrl: savedCoverLink(collection),
+  };
+}
+
+function toCollectionWrite(form: CollectionForm): CollectionWrite {
+  return {
+    name: form.name,
+    description: form.description,
+    season: form.season,
+    image_url: form.imageUrl.trim(),
+  };
+}
+
+function collectionDiff(original: Collection, next: CollectionWrite): Partial<CollectionWrite> {
+  const patch: Partial<CollectionWrite> = {};
+  if (next.name !== original.name) {
+    patch.name = next.name;
+  }
+  if (next.description !== original.description) {
+    patch.description = next.description;
+  }
+  if (next.season !== original.season) {
+    patch.season = next.season;
+  }
+  if (next.image_url !== savedCoverLink(original)) {
+    patch.image_url = next.image_url;
+  }
+  return patch;
+}
+
+function CollectionFields({
+  idPrefix,
+  value,
+  onChange,
+}: {
+  idPrefix: string;
+  value: CollectionForm;
+  onChange: (next: CollectionForm) => void;
+}) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="space-y-1 sm:col-span-2">
+        <Label htmlFor={`${idPrefix}-name`}>Name</Label>
+        <Input
+          id={`${idPrefix}-name`}
+          value={value.name}
+          onValueChange={(name) => onChange({ ...value, name })}
+        />
+      </div>
+      <div className="space-y-1 sm:col-span-2">
+        <Label htmlFor={`${idPrefix}-description`}>Description</Label>
+        <Textarea
+          id={`${idPrefix}-description`}
+          value={value.description}
+          onChange={(event) => onChange({ ...value, description: event.target.value })}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor={`${idPrefix}-season`}>Season</Label>
+        <Input
+          id={`${idPrefix}-season`}
+          value={value.season}
+          onValueChange={(season) => onChange({ ...value, season })}
+        />
+      </div>
+      <div className="space-y-1 sm:col-span-2">
+        <Label htmlFor={`${idPrefix}-image-url`}>Image link</Label>
+        <Input
+          id={`${idPrefix}-image-url`}
+          value={value.imageUrl}
+          onValueChange={(imageUrl) => onChange({ ...value, imageUrl })}
+          placeholder="https://"
+        />
+      </div>
+    </div>
+  );
+}
 
 function OptionSelect({
   id,
@@ -291,10 +404,13 @@ export function AdminBoard() {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [categories, setCategories] = useState<CatalogOption[]>([]);
   const [collections, setCollections] = useState<CatalogOption[]>([]);
+  const [drops, setDrops] = useState<Collection[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [createDraft, setCreateDraft] = useState<ProductForm>(emptyCreate);
+  const [collectionCreate, setCollectionCreate] = useState<CollectionForm>(emptyCollectionCreate);
   const [edits, setEdits] = useState<Record<string, ProductForm>>({});
+  const [dropEdits, setDropEdits] = useState<Record<string, CollectionForm>>({});
   const [pending, setPending] = useState<string | null>(null);
   const [catalogTick, setCatalogTick] = useState(0);
 
@@ -336,8 +452,8 @@ export function AdminBoard() {
       return;
     }
     let ignore = false;
-    Promise.all([getProducts(), getCategories(), getCollections()])
-      .then(([nextProducts, nextCategories, nextCollections]) => {
+    Promise.all([getProducts(), getCategories(), getCollections(), getCollectionList()])
+      .then(([nextProducts, nextCategories, nextCollections, nextDrops]) => {
         if (ignore) {
           return;
         }
@@ -345,9 +461,15 @@ export function AdminBoard() {
         setProducts(nextProducts);
         setCategories(nextCategories);
         setCollections(nextCollections);
+        setDrops(nextDrops);
         setEdits(
           Object.fromEntries(
             nextProducts.map((product) => [String(product.id), draftFromProduct(product)]),
+          ),
+        );
+        setDropEdits(
+          Object.fromEntries(
+            nextDrops.map((drop) => [String(drop.id), draftFromCollection(drop)]),
           ),
         );
         setCreateDraft((current) => ({
@@ -404,6 +526,77 @@ export function AdminBoard() {
       setPassword("");
     } catch (caught) {
       setNotice(caught instanceof Error ? caught.message : "Could not lock the catalog.");
+    } finally {
+      setPending(null);
+    }
+  }
+
+  async function reloadDrops() {
+    const [nextCollections, nextDrops] = await Promise.all([
+      getCollections(),
+      getCollectionList(),
+    ]);
+    setCollections(nextCollections);
+    setDrops(nextDrops);
+    setDropEdits(
+      Object.fromEntries(nextDrops.map((drop) => [String(drop.id), draftFromCollection(drop)])),
+    );
+    setCreateDraft((current) => ({
+      ...current,
+      collection: current.collection || nextCollections[0]?.slug || "",
+    }));
+  }
+
+  async function onCreateCollection(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending("collection-create");
+    setNotice(null);
+    try {
+      await createAdminCollection(toCollectionWrite(collectionCreate));
+      setCollectionCreate(emptyCollectionCreate);
+      await reloadDrops();
+    } catch (caught) {
+      setNotice(caught instanceof Error ? caught.message : "Could not add that drop.");
+    } finally {
+      setPending(null);
+    }
+  }
+
+  async function onSaveCollection(drop: Collection) {
+    const draft = dropEdits[String(drop.id)];
+    if (!draft) {
+      return;
+    }
+    const patch = collectionDiff(drop, toCollectionWrite(draft));
+    if (Object.keys(patch).length === 0) {
+      return;
+    }
+    setPending(`collection-save-${drop.id}`);
+    setNotice(null);
+    try {
+      await updateAdminCollection(drop.id, patch);
+      await reloadDrops();
+    } catch (caught) {
+      setNotice(caught instanceof Error ? caught.message : "Could not save that drop.");
+    } finally {
+      setPending(null);
+    }
+  }
+
+  async function onDeleteCollection(drop: Collection) {
+    setPending(`collection-delete-${drop.id}`);
+    setNotice(null);
+    try {
+      await deleteAdminCollection(drop.id);
+      await reloadDrops();
+    } catch (caught) {
+      if (caught instanceof ApiError && caught.status === 409) {
+        setNotice(
+          caught.message || "Move or remove this drop's pieces before deleting it.",
+        );
+      } else {
+        setNotice(caught instanceof Error ? caught.message : "Could not delete that drop.");
+      }
     } finally {
       setPending(null);
     }
@@ -563,8 +756,9 @@ export function AdminBoard() {
         <div>
           <h1 className="text-xl font-bold">Catalog</h1>
           <p className="mt-1 max-w-xl text-[13px]">
-            Add and edit pieces for the shop. The image field takes an https photo link. A blank
-            field keeps the generated canvas.
+            Add and edit drops and pieces. A drop cover takes an https photo link. Leave it blank
+            to keep the first piece&apos;s picture on Collections. A blank piece image keeps the
+            generated canvas.
           </p>
         </div>
         <Button type="button" onClick={() => void onLogout()} disabled={pending === "logout"}>
@@ -574,6 +768,89 @@ export function AdminBoard() {
       </div>
 
       {notice ? <ErrorState title="Request failed" description={notice} /> : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Collections</CardTitle>
+          <CardDescription>
+            Creates a drop on the store API. Renaming it keeps the public address.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onCreateCollection} className="space-y-4" noValidate>
+            <CollectionFields
+              idPrefix="collection-create"
+              value={collectionCreate}
+              onChange={setCollectionCreate}
+            />
+            <Button
+              type="submit"
+              disabled={pending === "collection-create" || !collectionCreate.name}
+            >
+              {pending === "collection-create" ? "Saving…" : "Create"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {drops.map((drop) => {
+        const key = String(drop.id);
+        const draft = dropEdits[key] ?? draftFromCollection(drop);
+        const src = collectionDisplaySrc(drop);
+        return (
+          <Card key={`drop-${key}`}>
+            <div className="grid gap-0 sm:grid-cols-[160px_1fr]">
+              {src ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={src}
+                  alt={drop.name}
+                  className="h-40 w-full object-cover sm:h-full"
+                />
+              ) : (
+                <div className="win-sunken flex h-40 items-center justify-center bg-white text-[12px] sm:h-full">
+                  No image
+                </div>
+              )}
+              <div>
+                <CardHeader>
+                  <CardTitle>{drop.name}</CardTitle>
+                  <CardDescription>
+                    {drop.slug} · {drop.season || "No season"} · {drop.product_count}{" "}
+                    {drop.product_count === 1 ? "piece" : "pieces"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CollectionFields
+                    idPrefix={`collection-edit-${key}`}
+                    value={draft}
+                    onChange={(next) =>
+                      setDropEdits((current) => ({ ...current, [key]: next }))
+                    }
+                  />
+                </CardContent>
+                <CardFooter className="gap-2">
+                  <Button
+                    type="button"
+                    disabled={pending === `collection-save-${drop.id}`}
+                    onClick={() => void onSaveCollection(drop)}
+                  >
+                    {pending === `collection-save-${drop.id}` ? "Saving…" : "Save"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={pending === `collection-delete-${drop.id}`}
+                    onClick={() => void onDeleteCollection(drop)}
+                  >
+                    {pending === `collection-delete-${drop.id}` ? "Deleting…" : "Delete"}
+                  </Button>
+                </CardFooter>
+              </div>
+            </div>
+          </Card>
+        );
+      })}
 
       <Card>
         <CardHeader>
