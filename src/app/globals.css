@@ -288,10 +288,13 @@
     height: 25px;
     align-items: center;
     justify-content: center;
+    padding: 0;
     background: var(--face);
     border: 2px solid;
     border-color: var(--highlight) var(--dark-shadow) var(--dark-shadow) var(--highlight);
     color: #000;
+    font: inherit;
+    cursor: pointer;
   }
 
   .win-tool[data-active="true"],
@@ -303,8 +306,10 @@
   .win-swatch {
     width: 16px;
     height: 15px;
+    padding: 0;
     border: 1px solid;
     border-color: #808080 #fff #fff #808080;
     box-shadow: inset 1px 1px 0 #000;
+    cursor: pointer;
   }
 }

@@ -21,9 +21,13 @@ npm run build
 npm start
 ```
 
+## Paint tab
+
+On `/`, the window is a drawing surface. Left click uses the foreground color; right click uses the background. Pick a swatch with left/right click. Clothing icons stamp silhouettes. Curve works like Paint: drag a line, then click twice to bend it. Ctrl+Z / Ctrl+Y undo and redo. Escape cancels a curve in progress.
+
 ## Pages
 
-- Canvas home, shop (live catalog + Stripe test checkout), collections (live drops from `GET /collections`), videos, about, contact
+- Paint tab (`/`) is a working Microsoft Paint canvas (pencil, eraser, fill, line, curve, shapes, clothing stamps, palette, undo). Shop (live catalog + Stripe test checkout), collections (live drops from `GET /collections`), videos, about, contact
 - Paint status line is an anonymous note board (`GET`/`POST /board`) when `NEXT_PUBLIC_API_URL` is set. No accounts. Staff can remove notes after unlocking at `/admin`.
 - Staff catalog editor at `/admin` (not in the public nav). Shoppers do not have accounts. Unlock with the API password, then create, patch, and delete products.
 

@@ -1,10 +1,13 @@
-import { OimadisCanvas } from "@/components/oimadis-canvas";
 import { MarketingShell } from "@/components/marketing-shell";
+import { PaintCanvas } from "@/components/paint-canvas";
+import { PaintStudioProvider } from "@/components/paint-studio";
 
 export default function HomePage() {
   return (
-    <MarketingShell>
-      <OimadisCanvas />
-    </MarketingShell>
+    <PaintStudioProvider>
+      <MarketingShell>
+        <PaintCanvas />
+      </MarketingShell>
+    </PaintStudioProvider>
   );
 }

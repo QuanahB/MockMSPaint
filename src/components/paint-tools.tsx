@@ -1,8 +1,10 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { type PaintTool, usePaintStudio } from "@/components/paint-studio";
 
 function SelectLasso({ className }: { className?: string }) {
   return (
@@ -124,30 +126,75 @@ function Oval({ className }: { className?: string }) {
   );
 }
 
-const tools = [
-  { href: "/", label: "Select", icon: SelectLasso },
-  { href: "/", label: "Select area", icon: SelectRect },
-  { href: "/shop", label: "Tees", icon: Tee },
-  { href: "/shop", label: "Shorts", icon: Shorts },
-  { href: "/shop", label: "Long sleeve", icon: LongSleeve },
-  { href: "/shop", label: "Pants", icon: Pants },
-  { href: "/shop", label: "Hoodie", icon: Hoodie },
-  { href: "/shop", label: "Underwear", icon: Boxers },
-  { href: "/shop", label: "Sweater", icon: Sweater },
-  { href: "/shop", label: "Hat", icon: Cap },
-  { href: "/", label: "Line", icon: LineTool },
-  { href: "/", label: "Curve", icon: CurveTool },
-  { href: "/", label: "Rounded rectangle", icon: RoundRect },
-  { href: "/", label: "Oval", icon: Oval },
+function FillBucket({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className={className} aria-hidden>
+      <path d="M2 8 8 2l6 6H12v5H4V8z" fill="#111" />
+      <path d="M11 12c1.2 1.4 3.2 1.2 3.2-1" stroke="#000080" fill="none" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+function Eyedropper({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className={className} aria-hidden>
+      <path d="M9 2l5 5-7 7H2v-5z" fill="#111" />
+      <path d="M8.5 3.5 12.5 7.5" stroke="#c0c0c0" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+const tools: {
+  id: PaintTool;
+  href: string;
+  label: string;
+  paintLabel: string;
+  icon: (props: { className?: string }) => ReactNode;
+}[] = [
+  { id: "pencil", href: "/", label: "Select", paintLabel: "Pencil", icon: SelectLasso },
+  { id: "eraser", href: "/", label: "Select area", paintLabel: "Eraser", icon: SelectRect },
+  { id: "stamp-tee", href: "/shop", label: "Tees", paintLabel: "Stamp tee", icon: Tee },
+  { id: "stamp-shorts", href: "/shop", label: "Shorts", paintLabel: "Stamp shorts", icon: Shorts },
+  { id: "stamp-longsleeve", href: "/shop", label: "Long sleeve", paintLabel: "Stamp long sleeve", icon: LongSleeve },
+  { id: "stamp-pants", href: "/shop", label: "Pants", paintLabel: "Stamp pants", icon: Pants },
+  { id: "stamp-hoodie", href: "/shop", label: "Hoodie", paintLabel: "Stamp hoodie", icon: Hoodie },
+  { id: "stamp-underwear", href: "/shop", label: "Underwear", paintLabel: "Stamp underwear", icon: Boxers },
+  { id: "stamp-sweater", href: "/shop", label: "Sweater", paintLabel: "Stamp sweater", icon: Sweater },
+  { id: "stamp-hat", href: "/shop", label: "Hat", paintLabel: "Stamp hat", icon: Cap },
+  { id: "line", href: "/", label: "Line", paintLabel: "Line", icon: LineTool },
+  { id: "curve", href: "/", label: "Curve", paintLabel: "Curve", icon: CurveTool },
+  { id: "roundrect", href: "/", label: "Rounded rectangle", paintLabel: "Rounded rectangle", icon: RoundRect },
+  { id: "oval", href: "/", label: "Oval", paintLabel: "Oval", icon: Oval },
+  { id: "fill", href: "/", label: "Fill", paintLabel: "Fill", icon: FillBucket },
+  { id: "pick", href: "/", label: "Pick color", paintLabel: "Pick color", icon: Eyedropper },
 ];
 
 export function PaintTools() {
   const pathname = usePathname();
+  const studio = usePaintStudio();
 
   return (
     <div className="grid grid-cols-2 gap-px">
       {tools.map((tool, index) => {
         const Icon = tool.icon;
+        if (studio) {
+          const active = studio.tool === tool.id;
+          return (
+            <button
+              key={tool.id}
+              type="button"
+              className={cn("win-tool")}
+              data-active={active ? "true" : undefined}
+              title={tool.paintLabel}
+              aria-label={tool.paintLabel}
+              aria-pressed={active}
+              onClick={() => studio.setTool(tool.id)}
+            >
+              <Icon className="size-4" />
+            </button>
+          );
+        }
+
         const active = pathname === "/" ? index === 0 : tool.href === pathname && index === 2;
         return (
           <Link
