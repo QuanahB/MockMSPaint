@@ -6,6 +6,7 @@ import type {
   CatalogOption,
   CheckoutPayload,
   CheckoutStart,
+  Collection,
   Product,
   ProductWrite,
   StoreOrder,
@@ -261,5 +262,30 @@ export function deleteBoardNote(id: number) {
   return storeRequest<undefined>(`/admin/board/${id}`, {
     method: "DELETE",
   });
+}
+
+function asCollectionList(data: unknown): Collection[] {
+  if (Array.isArray(data)) {
+    return data as Collection[];
+  }
+  if (data && typeof data === "object" && Array.isArray((data as { collections?: unknown }).collections)) {
+    return (data as { collections: Collection[] }).collections;
+  }
+  throw new ApiError("The collections response was not a list");
+}
+
+function asCollection(data: unknown): Collection {
+  if (data && typeof data === "object" && "collection" in data) {
+    return (data as { collection: Collection }).collection;
+  }
+  return data as Collection;
+}
+
+export function getCollectionList() {
+  return storeRequest<unknown>("/collections").then(asCollectionList);
+}
+
+export function getCollection(slug: string) {
+  return storeRequest<unknown>(`/collections/${encodeURIComponent(slug)}`).then(asCollection);
 }
 

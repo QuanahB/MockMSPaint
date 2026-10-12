@@ -102,3 +102,14 @@ export type BoardNote = {
   message: string;
   created_at: string;
 };
+
+export type Collection = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  season: string;
+  product_count: number;
+  image_url: string | null;
+  products?: Product[];
+};
