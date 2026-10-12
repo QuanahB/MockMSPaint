@@ -1,17 +1,26 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { PAINT_COLORS, usePaintStudio } from "@/components/paint-studio";
 
 export function PaintPalette() {
+  const pathname = usePathname();
   const studio = usePaintStudio();
+  const painting = Boolean(studio) && pathname === "/";
   const top = PAINT_COLORS.slice(0, 14);
   const bottom = PAINT_COLORS.slice(14);
   const foreground = studio?.foreground ?? "#000000";
   const background = studio?.background ?? "#ffffff";
 
+  const pick = (color: string, button: number) => {
+    if (!studio || !painting) return;
+    if (button === 2) studio.setBackground(color);
+    else studio.setForeground(color);
+  };
+
   const renderRow = (colors: readonly string[], prefix: string) =>
     colors.map((color) => {
-      if (!studio) {
+      if (!painting || !studio) {
         return (
           <span
             key={`${prefix}-${color}`}
@@ -27,12 +36,19 @@ export function PaintPalette() {
           type="button"
           className="win-swatch"
           style={{ backgroundColor: color }}
+          data-active={color === foreground ? "fg" : color === background ? "bg" : undefined}
           title={`${color} — left click foreground, right click background`}
           aria-label={`Color ${color}`}
-          onClick={() => studio.setForeground(color)}
+          onPointerDown={(event) => {
+            pick(color, event.button);
+          }}
+          onClick={(event) => {
+            event.preventDefault();
+            pick(color, 0);
+          }}
           onContextMenu={(event) => {
             event.preventDefault();
-            studio.setBackground(color);
+            pick(color, 2);
           }}
         />
       );

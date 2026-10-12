@@ -312,4 +312,9 @@
     box-shadow: inset 1px 1px 0 #000;
     cursor: pointer;
   }
+
+  .win-swatch[data-active="fg"] {
+    outline: 1px dotted #000;
+    outline-offset: 0;
+  }
 }

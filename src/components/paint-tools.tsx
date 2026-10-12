@@ -172,12 +172,13 @@ const tools: {
 export function PaintTools() {
   const pathname = usePathname();
   const studio = usePaintStudio();
+  const painting = Boolean(studio) && pathname === "/";
 
   return (
     <div className="grid grid-cols-2 gap-px">
       {tools.map((tool, index) => {
         const Icon = tool.icon;
-        if (studio) {
+        if (painting && studio) {
           const active = studio.tool === tool.id;
           return (
             <button

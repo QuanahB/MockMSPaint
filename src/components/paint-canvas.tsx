@@ -334,6 +334,7 @@ export function PaintCanvas() {
   }, []);
 
   useEffect(() => {
+    studioRef.current = studio;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -555,7 +556,7 @@ export function PaintCanvas() {
       canvas.removeEventListener("contextmenu", onContext);
       window.removeEventListener("keydown", onKey);
     };
-  }, [restore, snapshot, undo, redo]);
+  }, [studio, restore, snapshot, undo, redo]);
 
   if (!studio) return null;
 
